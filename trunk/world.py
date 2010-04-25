@@ -19,4 +19,5 @@ class World(DirectObject):
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
         self.rink.reparentTo(render)
-            
+	
+	camera.setPos(10, 10, 20)

@@ -17,6 +17,7 @@ from pandac.PandaModules import Filename
 
 class Rock(DirectObject): #use to create player tank
     def __init__(self, color, world):
+        self.world = world
         self.rock = loader.loadModel("art/Rock "+color+".egg")
         self.rock.setScale(.065)
         self.rock.setZ(self.rock.getZ()+.1)
@@ -25,25 +26,29 @@ class Rock(DirectObject): #use to create player tank
         self.friction = 0.0168
         self.mass = 18
         self.gravity = 9.81
+        self.move = False
 
         self.keyMap = {"left":0, "right":0, "forward":0, "back":0, "headlight":0, "fire":0}
         taskMgr.add(self.update, "Update")
 
     def setkeyMap(self, keyMap):
-        self.keyMap = keyMap
-        
+        self.keyMap = keyMap        
 
     def update(self, task):
-        normalforce = self.mass * self.gravity
-        frictionforce = normalforce * self.friction
-        acceleration = frictionforce / self.mass
-        self.velocity -= acceleration
-        
-        if(self.velocity > 0):
-            self.rock.setPos(self.rock.getX(), self.rock.getY()+ self.velocity, self.rock.getZ())
-        else:
-            print "Rock stopped"
-            return Task.done
+        if self.world.keyMap["push"]:
+            self.move = True
+            
+        if self.move == True:
+            normalforce = self.mass * self.gravity
+            frictionforce = normalforce * self.friction
+            acceleration = frictionforce / self.mass
+            self.velocity -= acceleration
+            
+            if(self.velocity > 0):
+                self.rock.setPos(self.rock.getX(), self.rock.getY()+ self.velocity, self.rock.getZ())
+            else:
+                print "Rock stopped"
+                return Task.done
             
         return Task.cont
     

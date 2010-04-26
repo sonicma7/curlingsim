@@ -19,5 +19,15 @@ class World(DirectObject):
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
         self.rink.reparentTo(render)
+        
+        self.keyMap = {"push":0}  
+
+        self.accept("mouse1", self.setKey, ["push", 1])    
+        self.accept("mouse1-up", self.setKey, ["push", 0])
+        self.accept('escape', sys.exit)
 	
-	camera.setPos(10, 10, 20)
+        camera.setPos(10, 10, 20)
+    
+    def setKey(self, key, value):
+        self.keyMap[key] = value
+        

@@ -1,6 +1,6 @@
 //Maya ASCII 2009 scene
-//Name: Rock 2.ma
-//Last modified: Fri, Apr 23, 2010 06:07:10 PM
+//Name: Rock Yellow.ma
+//Last modified: Mon, Apr 26, 2010 02:55:13 PM
 //Codeset: 1252
 requires maya "2009";
 currentUnit -l centimeter -a degree -t film;
@@ -2518,6 +2518,7 @@ createNode mesh -n "pCylinderShape2" -p "transform2";
 	setAttr ".cvd" -type "dataPolyComponent" Index_Data Vertex 0 ;
 createNode transform -n "polySurface1";
 	setAttr ".r" -type "double3" 0 90 0 ;
+	setAttr ".s" -type "double3" 0.25 0.25 0.25 ;
 createNode mesh -n "polySurfaceShape1" -p "polySurface1";
 	addAttr -ci true -sn "mso" -ln "miShadingSamplesOverride" -min 0 -max 1 -at "bool";
 	addAttr -ci true -sn "msh" -ln "miShadingSamples" -min 0 -smx 8 -at "float";
@@ -3513,4 +3514,4 @@ connectAttr "groupId1.msg" ":initialShadingGroup.gn" -na;
 connectAttr "groupId2.msg" ":initialShadingGroup.gn" -na;
 connectAttr "groupId3.msg" ":initialShadingGroup.gn" -na;
 connectAttr "groupId4.msg" ":initialShadingGroup.gn" -na;
-// End of Rock 2.ma
+// End of Rock Yellow.ma

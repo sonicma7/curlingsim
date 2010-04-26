@@ -1,6 +1,6 @@
 //Maya ASCII 2009 scene
 //Name: Rink.ma
-//Last modified: Fri, Apr 23, 2010 08:23:59 PM
+//Last modified: Mon, Apr 26, 2010 02:59:05 PM
 //Codeset: 1252
 requires maya "2009";
 currentUnit -l centimeter -a degree -t film;
@@ -67,7 +67,6 @@ createNode camera -s -n "sideShape" -p "side";
 	setAttr ".o" yes;
 createNode transform -n "pCube1";
 	setAttr ".t" -type "double3" -0.64805617332458498 0.11249999999999377 0 ;
-	setAttr ".s" -type "double3" 0.15 0.15 0.15 ;
 	setAttr ".rp" -type "double3" 0.64805617332458498 -0.11249999999999376 0 ;
 	setAttr ".sp" -type "double3" 4.3203744888305664 -0.74999999999998945 0 ;
 	setAttr ".spt" -type "double3" -3.6723183155059815 0.63749999999999574 0 ;

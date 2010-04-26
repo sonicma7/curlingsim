@@ -19,12 +19,16 @@ class Rock(DirectObject): #use to create player tank
     def __init__(self, color, world):
         self.world = world
         self.rock = loader.loadModel("art/Rock "+color+".egg")
-        self.rock.setScale(.065)
-        self.rock.setZ(self.rock.getZ()+.1)
+        self.rock.setScale(1)
+        self.rock.setZ(self.rock.getZ()+.7)
+        self.rock.setY(self.rock.getY() - 60)
         self.rock.reparentTo(render)
-        self.velocity = 3
+        self.yvelocity = 0.750
+        self.xvelocity = 0
+        self.spin = 2
         self.friction = 0.0168
         self.mass = 18
+        self.radius = 0.195
         self.gravity = 9.81
         self.move = False
 
@@ -35,17 +39,25 @@ class Rock(DirectObject): #use to create player tank
         self.keyMap = keyMap        
 
     def update(self, task):
+        dt = globalClock.getDt()
+        
         if self.world.keyMap["push"]:
             self.move = True
+            #self.time = globalClock.getDt()*60
+    
             
         if self.move == True:
+            #dt = 
             normalforce = self.mass * self.gravity
             frictionforce = normalforce * self.friction
             acceleration = frictionforce / self.mass
-            self.velocity -= acceleration
+            self.yvelocity -= acceleration * dt
             
-            if(self.velocity > 0):
-                self.rock.setPos(self.rock.getX(), self.rock.getY()+ self.velocity, self.rock.getZ())
+            self.xvelocity = self.spin * self.radius * dt
+            
+            
+            if(self.yvelocity > 0):
+                self.rock.setPos(self.rock.getX() + self.xvelocity, self.rock.getY()+ self.yvelocity, self.rock.getZ())
             else:
                 print "Rock stopped"
                 return Task.done

@@ -63,7 +63,7 @@ class World(DirectObject):
                     dy = ay-by
                     dz = az-bz
                     distance = math.sqrt(dx*dx+dy*dy+dz*dz)
-                    if distance < 7*i.radius: 
+                    if distance < 2*i.radius: 
                         velocity = i.yvelocity + j.yvelocity
                         i.yvelocity = velocity/2
                         j.yvelocity = velocity/2

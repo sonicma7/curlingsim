@@ -29,7 +29,7 @@ class Rock(DirectObject): #use to create player tank
         self.spin = 1
         self.friction = 0.0168
         self.mass = 18
-        self.radius = 0.195
+        self.radius = 0.75
         self.gravity = 9.81
         self.move = False
 
@@ -50,7 +50,7 @@ class Rock(DirectObject): #use to create player tank
         frictionforce = normalforce * self.friction
         acceleration = frictionforce / self.mass
         self.yvelocity -= acceleration * dt
-        self.xvelocity = self.spin * self.radius * 7 * dt
+        self.xvelocity = self.spin * self.radius * dt
         
         if(self.yvelocity > 0):
             self.rock.setPos(self.rock.getX() + self.xvelocity, self.rock.getY()+ self.yvelocity, self.rock.getZ())

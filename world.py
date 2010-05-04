@@ -11,23 +11,29 @@ from pandac.PandaModules import TransparencyAttrib
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.DirectGui import *
 
-import rock
+import rock, camera
 
 class World(DirectObject):
     def __init__(self):
-        self.activeRocks = []
-        self.currentRock = rock.Rock("Red",self)
-        self.passiveRocks = [self.currentRock]        
+        self.camera = camera.Camera(self)
+        self.currentRock = rock.Rock("Red",self)        
+        self.activeRocks = []       
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
         self.rink.reparentTo(render)
         self.turn = 1
+        
+        self.rocksMoving = False
         
         self.keyMap = {"push":0}  
 
         self.accept("k", self.pushRock)    
         #self.accept("k-up", self.setKey, ["push", 0])
         self.accept('escape', sys.exit)
+        self.accept("1", self.camera.setCamera,[1])
+        self.accept("2", self.camera.setCamera,[2])
+        self.accept("3", self.camera.setCamera,[3]) 
+        self.accept("4", self.camera.setCamera,[4])
         
         taskMgr.add(self.update, "World-Update")
 
@@ -41,12 +47,16 @@ class World(DirectObject):
             self.currentRock = rock.Rock("Yellow",self)
         else:    
             self.currentRock = rock.Rock("Red",self)
+        #self.camera.changeView()
         
-    def update(self, task):         
+    def update(self, task):
+        self.rocksMoving = False         
         for i in self.activeRocks:
             i.Update()
-
+            if i.xvelocity != 0 or i.yvelocity != 0:
+                self.rocksMoving = True
         self.checkCollisions()
+        self.camera.Update()
         return task.cont
         
     def checkCollisions(self):

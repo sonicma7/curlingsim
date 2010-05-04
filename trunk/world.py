@@ -53,7 +53,7 @@ class World(DirectObject):
         self.rocksMoving = False         
         for i in self.activeRocks:
             i.Update()
-            if i.xvelocity != 0 or i.yvelocity != 0:
+            if i.velocity.getX() != 0 or i.velocity.getY() != 0:
                 self.rocksMoving = True
         self.checkCollisions()
         self.camera.Update()
@@ -63,20 +63,37 @@ class World(DirectObject):
         for i in self.activeRocks:
             for j in self.activeRocks:
                 if i != j:
-                    ax = i.rock.getPos().getX()
-                    ay = i.rock.getPos().getY()
-                    az = i.rock.getPos().getZ()
-                    bx = j.rock.getPos().getX()
-                    by = j.rock.getPos().getY()
-                    bz = j.rock.getPos().getZ()
-                    dx = ax-bx
-                    dy = ay-by
-                    dz = az-bz
-                    distance = math.sqrt(dx*dx+dy*dy+dz*dz)
-                    if distance < 2*i.radius: 
-                        velocity = i.yvelocity + j.yvelocity
-                        i.yvelocity = velocity/2
-                        j.yvelocity = velocity/2
+                    if self.computeDistance(i,j) < 2*i.radius: 
+                        i.colliding = True
+                        j.colliding = True
+                        normal = self.findNormal(i, j)
+                        unitnormal = self.getUnitNormal(normal)
+                        unittangent = Vec3(-unitnormal.getY(), unitnormal.getX(), 0)
+                        normvelo1 = unitnormal.dot(i.velocity)
+                        normvelo2 = unitnormal.dot(j.velocity) 
+                        tangvelo1 = unittangent.dot(i.velocity)
+                        tangvelo2 = unittangent.dot(j.velocity)
+                        newnorm1 = (2 * j.mass * normvelo2)/(i.mass + j.mass)
+                        newnorm2 = (2 * i.mass * normvelo1)/(i.mass + j.mass)
+                        newnormvec1 = unitnormal * newnorm1 
+                        newnormvec2 = unitnormal * newnorm2
+                        newtangvec1 = unittangent * tangvelo1
+                        newtangvec2 = unittangent * tangvelo2
+                        i.velocity = newnormvec1 + newtangvec1
+                        j.velocity = newnormvec2 + newtangvec2
+                        return
                         
-    def computeDistance(a,b):
-        pass
+    def findNormal(self, a,b):
+        return Vec3(b.rock.getPos().getX()-a.rock.getPos().getX(), b.rock.getPos().getY()-a.rock.getPos().getY(),0)
+    
+    def getUnitNormal(self, normal):
+        return normal/(math.sqrt(pow(normal.getX(),2) + pow(normal.getY(),2)))
+    
+    def computeDistance(self, a,b):
+        ax = a.rock.getPos().getX()
+        ay = a.rock.getPos().getY()
+        bx = b.rock.getPos().getX()
+        by = b.rock.getPos().getY()
+        dx = ax-bx
+        dy = ay-by
+        return math.sqrt(dx*dx+dy*dy)

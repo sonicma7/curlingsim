@@ -24,14 +24,14 @@ class Rock(DirectObject): #use to create player tank
         self.rock.setZ(self.rock.getZ()+.7)
         self.rock.setY(self.rock.getY() - 60)
         self.rock.reparentTo(render)
-        self.yvelocity = 0.750
-        self.xvelocity = 0
+        self.velocity = Vec3(0,0.750,0)
         self.spin = 1
         self.friction = 0.0168
         self.mass = 18
         self.radius = 0.75
         self.gravity = 9.81
         self.move = False
+	self.colliding = False
 
         self.keyMap = {"left":0, "right":0, "forward":0, "back":0, "headlight":0, "fire":0}
         
@@ -49,15 +49,16 @@ class Rock(DirectObject): #use to create player tank
         normalforce = self.mass * self.gravity
         frictionforce = normalforce * self.friction
         acceleration = frictionforce / self.mass
-        self.yvelocity -= acceleration * dt
-        self.xvelocity = self.spin * self.radius * dt
+        self.velocity.setY(self.velocity.getY() - acceleration * dt)
+	#if(self.colliding == False):
+	#self.velocity.setX(self.spin * self.radius * dt)
         
-        if(self.yvelocity > 0):
-            self.rock.setPos(self.rock.getX() + self.xvelocity, self.rock.getY()+ self.yvelocity, self.rock.getZ())
+        if(self.velocity.getY() > 0):
+            self.rock.setPos(self.rock.getX() + self.velocity.getX(), self.rock.getY()+ self.velocity.getY(), self.rock.getZ())
             self.rock.setH(self.rock.getH()-self.spin)
         else:
-            self.yvelocity = 0
-            self.xvelocity = 0
+            self.velocity.setY(0)
+            self.velocity.setX(0)
             #print "Rock stopped"
             #return Task.done
     

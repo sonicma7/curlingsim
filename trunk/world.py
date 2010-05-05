@@ -13,10 +13,19 @@ from direct.gui.DirectGui import *
 
 import rock, camera
 
+def id_gen():
+    k = 0
+    while True:
+        k += 1
+        yield k
+
+unique_id = id_gen().next
+
 class World(DirectObject):
     def __init__(self):
         self.camera = camera.Camera(self)
-        self.currentRock = rock.Rock("Red",self)        
+        id = str(unique_id())
+        self.currentRock = rock.Rock("Red", id, self)        
         self.activeRocks = []       
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
@@ -42,12 +51,16 @@ class World(DirectObject):
         self.keyMap[key] = value
         
     def pushRock(self):
+        id = str(unique_id())
         self.activeRocks.append(self.currentRock)
         if self.currentRock.color == "Red":
-            self.currentRock = rock.Rock("Yellow",self)
+            self.currentRock = rock.Rock("Yellow", id, self)
         else:    
-            self.currentRock = rock.Rock("Red",self)
+            self.currentRock = rock.Rock("Red", id, self)
         #self.camera.changeView()
+        for i in self.activeRocks:
+            i.collideDict[self.currentRock.id] = False
+            self.currentRock.collideDict[i.id] = False
         
     def update(self, task):
         self.rocksMoving = False         
@@ -64,24 +77,26 @@ class World(DirectObject):
             for j in self.activeRocks:
                 if i != j:
                     if self.computeDistance(i,j) < 2*i.radius: 
-                        i.colliding = True
-                        j.colliding = True
-                        normal = self.findNormal(i, j)
-                        unitnormal = self.getUnitNormal(normal)
-                        unittangent = Vec3(-unitnormal.getY(), unitnormal.getX(), 0)
-                        normvelo1 = unitnormal.dot(i.velocity)
-                        normvelo2 = unitnormal.dot(j.velocity) 
-                        tangvelo1 = unittangent.dot(i.velocity)
-                        tangvelo2 = unittangent.dot(j.velocity)
-                        newnorm1 = (2 * j.mass * normvelo2)/(i.mass + j.mass)
-                        newnorm2 = (2 * i.mass * normvelo1)/(i.mass + j.mass)
-                        newnormvec1 = unitnormal * newnorm1 
-                        newnormvec2 = unitnormal * newnorm2
-                        newtangvec1 = unittangent * tangvelo1
-                        newtangvec2 = unittangent * tangvelo2
-                        i.velocity = newnormvec1 + newtangvec1
-                        j.velocity = newnormvec2 + newtangvec2
-                        return
+                        if i.collideDict[j.id] == False:
+                            j.collideDict[i.id] = True
+                            normal = self.findNormal(i, j)
+                            unitnormal = self.getUnitNormal(normal)
+                            unittangent = Vec3(-unitnormal.getY(), unitnormal.getX(), 0)
+                            normvelo1 = unitnormal.dot(i.velocity)
+                            normvelo2 = unitnormal.dot(j.velocity) 
+                            tangvelo1 = unittangent.dot(i.velocity)
+                            tangvelo2 = unittangent.dot(j.velocity)
+                            newnorm1 = (2 * j.mass * normvelo2)/(i.mass + j.mass)
+                            newnorm2 = (2 * i.mass * normvelo1)/(i.mass + j.mass)
+                            newnormvec1 = unitnormal * newnorm1 
+                            newnormvec2 = unitnormal * newnorm2
+                            newtangvec1 = unittangent * tangvelo1
+                            newtangvec2 = unittangent * tangvelo2
+                            i.velocity = newnormvec1 + newtangvec1
+                            j.velocity = newnormvec2 + newtangvec2
+                    else:
+                        if i.collideDict[j.id] == True:
+                            i.collideDict[j.id] = False
                         
     def findNormal(self, a,b):
         return Vec3(b.rock.getPos().getX()-a.rock.getPos().getX(), b.rock.getPos().getY()-a.rock.getPos().getY(),0)

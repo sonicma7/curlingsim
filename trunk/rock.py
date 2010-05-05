@@ -16,7 +16,8 @@ import world
 from pandac.PandaModules import Filename
 
 class Rock(DirectObject): #use to create player tank
-    def __init__(self, color, world):
+    def __init__(self, color, id, world):
+        self.id = id
         self.world = world
         self.color = color
         self.rock = loader.loadModel("art/Rock "+color+".egg")
@@ -31,7 +32,7 @@ class Rock(DirectObject): #use to create player tank
         self.radius = 0.75
         self.gravity = 9.81
         self.move = False
-	self.colliding = False
+        self.collideDict = {}
 
         self.keyMap = {"left":0, "right":0, "forward":0, "back":0, "headlight":0, "fire":0}
         
@@ -50,8 +51,8 @@ class Rock(DirectObject): #use to create player tank
         frictionforce = normalforce * self.friction
         acceleration = frictionforce / self.mass
         self.velocity.setY(self.velocity.getY() - acceleration * dt)
-	#if(self.colliding == False):
-	#self.velocity.setX(self.spin * self.radius * dt)
+    #if(self.colliding == False):
+    #self.velocity.setX(self.spin * self.radius * dt)
         
         if(self.velocity.getY() > 0):
             self.rock.setPos(self.rock.getX() + self.velocity.getX(), self.rock.getY()+ self.velocity.getY(), self.rock.getZ())

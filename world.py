@@ -11,7 +11,7 @@ from pandac.PandaModules import TransparencyAttrib
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.DirectGui import *
 
-import rock, camera
+import rock, camera, hud
 
 def id_gen():
     k = 0
@@ -24,13 +24,14 @@ unique_id = id_gen().next
 class World(DirectObject):
     def __init__(self):
         self.camera = camera.Camera(self)
+        self.hud = hud.HUD(self)
         id = str(unique_id())
         self.currentRock = rock.Rock("Red", id, self)        
         self.activeRocks = []       
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
         self.rink.reparentTo(render)
-        self.turn = 1
+        self.turn = 0
         
         self.rocksMoving = False
         
@@ -42,7 +43,12 @@ class World(DirectObject):
         self.accept("1", self.camera.setCamera,[1])
         self.accept("2", self.camera.setCamera,[2])
         self.accept("3", self.camera.setCamera,[3]) 
-        self.accept("4", self.camera.setCamera,[4])
+        self.accept("4", self.camera.setCamera,[4]) 
+        self.accept("9", self.camera.setCamera,[9])
+        self.accept("arrow_up", self.hud.updateThrust,[1]) 
+        self.accept("arrow_down", self.hud.updateThrust,[-1])        
+        self.accept("arrow_right", self.hud.updateSpin,[1]) 
+        self.accept("arrow_left", self.hud.updateSpin,[-1])
         
         taskMgr.add(self.update, "World-Update")
 
@@ -50,8 +56,14 @@ class World(DirectObject):
     def setKey(self, key, value):
         self.keyMap[key] = value
         
+    def calculateVelocity(self): #Calculates the Vec3 velocity of the stone
+        return Vec3(0,self.hud.thrust*.01,0) +self.currentRock.velocity
+            
     def pushRock(self):
-        id = str(unique_id())
+        id = str(unique_id()) 
+        self.turn += 1                  
+        self.currentRock.spin = self.hud.spin*.5
+        self.currentRock.velocity = self.calculateVelocity()
         self.activeRocks.append(self.currentRock)
         if self.currentRock.color == "Red":
             self.currentRock = rock.Rock("Yellow", id, self)
@@ -61,15 +73,21 @@ class World(DirectObject):
         for i in self.activeRocks:
             i.collideDict[self.currentRock.id] = False
             self.currentRock.collideDict[i.id] = False
+        if self.turn == 16:
+            print "UPDATE SCORES"
         
     def update(self, task):
-        self.rocksMoving = False         
-        for i in self.activeRocks:
-            i.Update()
-            if i.velocity.getX() != 0 or i.velocity.getY() != 0:
-                self.rocksMoving = True
+        if self.turn == 16 and self.rocksMoving == False:
+            self.camera.setCamera(5)
+        else:
+            self.rocksMoving = False         
+            for i in self.activeRocks:
+                i.Update()
+                if i.velocity.getX() != 0 or i.velocity.getY() != 0:
+                    self.rocksMoving = True
         self.checkCollisions()
         self.camera.Update()
+        self.hud.Update()
         return task.cont
         
     def checkCollisions(self):

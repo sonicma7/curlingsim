@@ -26,7 +26,7 @@ class Rock(DirectObject): #use to create player tank
         self.rock.setY(self.rock.getY() - 60)
         self.rock.reparentTo(render)
         self.velocity = Vec3(0,0.750,0)
-        self.spin = 1
+        self.spin = 0
         self.friction = 0.0168
         self.mass = 18
         self.radius = 0.75

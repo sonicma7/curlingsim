@@ -57,7 +57,7 @@ class Camera(DirectObject):
                 rockPos = self.world.currentRock.rock.getPos()
                 rockHpr = self.world.currentRock.rock.getHpr()
             base.camera.setPos(0,rockPos.getY()-30,10)
-            base.camera.lookAt(0,41,0) 
+            base.camera.lookAt(rockPos) 
         if self.currentView == self.topCloseView:
             base.camera.setPos(0,41,50)
             base.camera.setHpr(180,-90,0)

@@ -11,7 +11,7 @@ from pandac.PandaModules import TransparencyAttrib
 from direct.gui.OnscreenText import OnscreenText
 from direct.gui.DirectGui import *
 
-import rock, camera, hud
+import rock, camera, hud, broom
 
 def id_gen():
     k = 0
@@ -25,6 +25,7 @@ class World(DirectObject):
     def __init__(self):
         self.camera = camera.Camera(self)
         self.hud = hud.HUD(self)
+        self.sweepingBrooms = broom.Broom(self)
         id = str(unique_id())
         self.currentRock = rock.Rock("Red", id, self)        
         self.activeRocks = []       
@@ -49,6 +50,8 @@ class World(DirectObject):
         self.accept("arrow_down", self.hud.updateThrust,[-1])        
         self.accept("arrow_right", self.hud.updateSpin,[1]) 
         self.accept("arrow_left", self.hud.updateSpin,[-1])
+        self.accept("mouse1", self.sweepingBrooms.setSweep,[True])
+        self.accept("mouse1-up", self.sweepingBrooms.setSweep,[False])
         
         taskMgr.add(self.update, "World-Update")
 
@@ -87,8 +90,16 @@ class World(DirectObject):
                     self.rocksMoving = True
         self.checkCollisions()
         self.camera.Update()
+        self.sweepingBrooms.Update()
+        self.removeOutofBoundsRocks()
         self.hud.Update()
         return task.cont
+        
+    def removeOutofBoundsRocks(self):
+        for i in xrange(len(self.activeRocks)):
+            if self.activeRocks[i].rock.getX() > 11.857 or self.activeRocks[i].rock.getX() < -11.857 or self.activeRocks[i].rock.getY() > 65:
+                self.activeRocks[i].rock.removeNode()
+                self.activeRocks.pop(i)
         
     def checkCollisions(self):
         for i in self.activeRocks:

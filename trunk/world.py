@@ -67,6 +67,7 @@ class World(DirectObject):
         self.turn += 1                  
         self.currentRock.spin = self.hud.spin*.5
         self.currentRock.velocity = self.calculateVelocity()
+        self.currentRock.findTangent()
         self.activeRocks.append(self.currentRock)
         if self.currentRock.color == "Red":
             self.currentRock = rock.Rock("Yellow", id, self)
@@ -113,7 +114,8 @@ class World(DirectObject):
                         if i.collideDict[j.id] == False:
                             j.collideDict[i.id] = True
                             self.separateRocks(i, j)
-                            self.computeCollision(i, j);
+                            self.computeCollision(i, j)
+                            self.computeRotation(i, j)
 
                     else:
                         if i.collideDict[j.id] == True:
@@ -159,3 +161,22 @@ class World(DirectObject):
         i.rock.setX(i.rock.getX() - (unitnormal.getX() * (move/distance)))
         i.rock.setY(i.rock.getY() - (unitnormal.getY() * (move/distance)))
         
+    def computeRotation(self, i, j):
+        if i.velocity.getY() > 0:
+            direction = i.velocity
+            unitdir = self.getUnitNormal(direction)
+            force = i.velocity * i.mass
+            normal = self.findNormal(j, i)
+            unitnormal = self.getUnitNormal(normal)
+            collisionpoint = unitnormal
+            angle = math.acos(direction.dot(collisionpoint))
+            print math.degrees(angle)
+        else:
+            direction = j.velocity
+            unitdir = self.getUnitNormal(direction)
+            force = j.velocity * j.mass
+            normal = self.findNormal(i, j)
+            unitnormal = self.getUnitNormal(normal)
+            collisionpoint = unitnormal
+            angle = math.acos(direction.dot(collisionpoint))
+            print math.degrees(angle)

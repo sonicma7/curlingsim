@@ -96,10 +96,14 @@ class World(DirectObject):
         return task.cont
         
     def removeOutofBoundsRocks(self):
+        delete = []
         for i in xrange(len(self.activeRocks)):
             if self.activeRocks[i].rock.getX() > 11.857 or self.activeRocks[i].rock.getX() < -11.857 or self.activeRocks[i].rock.getY() > 65:
-                self.activeRocks[i].rock.removeNode()
-                self.activeRocks.pop(i)
+                delete.append(i)
+        for i in xrange(len(delete)):
+            print delete,self.activeRocks
+            self.activeRocks[delete[i]-i].rock.removeNode()
+            self.activeRocks.pop(delete[i]-i)
         
     def checkCollisions(self):
         for i in self.activeRocks:

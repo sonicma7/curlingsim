@@ -101,7 +101,7 @@ class World(DirectObject):
             if self.activeRocks[i].rock.getX() > 11.857 or self.activeRocks[i].rock.getX() < -11.857 or self.activeRocks[i].rock.getY() > 65:
                 delete.append(i)
         for i in xrange(len(delete)):
-            print delete,self.activeRocks
+            #print delete,self.activeRocks
             self.activeRocks[delete[i]-i].rock.removeNode()
             self.activeRocks.pop(delete[i]-i)
         
@@ -112,21 +112,9 @@ class World(DirectObject):
                     if self.computeDistance(i,j) < 2*i.radius: 
                         if i.collideDict[j.id] == False:
                             j.collideDict[i.id] = True
-                            normal = self.findNormal(i, j)
-                            unitnormal = self.getUnitNormal(normal)
-                            unittangent = Vec3(-unitnormal.getY(), unitnormal.getX(), 0)
-                            normvelo1 = unitnormal.dot(i.velocity)
-                            normvelo2 = unitnormal.dot(j.velocity) 
-                            tangvelo1 = unittangent.dot(i.velocity)
-                            tangvelo2 = unittangent.dot(j.velocity)
-                            newnorm1 = (2 * j.mass * normvelo2)/(i.mass + j.mass)
-                            newnorm2 = (2 * i.mass * normvelo1)/(i.mass + j.mass)
-                            newnormvec1 = unitnormal * newnorm1 
-                            newnormvec2 = unitnormal * newnorm2
-                            newtangvec1 = unittangent * tangvelo1
-                            newtangvec2 = unittangent * tangvelo2
-                            i.velocity = newnormvec1 + newtangvec1
-                            j.velocity = newnormvec2 + newtangvec2
+                            self.separateRocks(i, j)
+                            self.computeCollision(i, j);
+
                     else:
                         if i.collideDict[j.id] == True:
                             i.collideDict[j.id] = False
@@ -145,3 +133,29 @@ class World(DirectObject):
         dx = ax-bx
         dy = ay-by
         return math.sqrt(dx*dx+dy*dy)
+        
+    def computeCollision(self, i, j):
+        normal = self.findNormal(i, j)
+        unitnormal = self.getUnitNormal(normal)
+        unittangent = Vec3(-unitnormal.getY(), unitnormal.getX(), 0)
+        normvelo1 = unitnormal.dot(i.velocity)
+        normvelo2 = unitnormal.dot(j.velocity) 
+        tangvelo1 = unittangent.dot(i.velocity)
+        tangvelo2 = unittangent.dot(j.velocity)
+        newnorm1 = (2 * j.mass * normvelo2)/(i.mass + j.mass)
+        newnorm2 = (2 * i.mass * normvelo1)/(i.mass + j.mass)
+        newnormvec1 = unitnormal * newnorm1 
+        newnormvec2 = unitnormal * newnorm2
+        newtangvec1 = unittangent * tangvelo1
+        newtangvec2 = unittangent * tangvelo2
+        i.velocity = newnormvec1 + newtangvec1
+        j.velocity = newnormvec2 + newtangvec2
+        
+    def separateRocks(self, i, j):
+        normal = self.findNormal(i, j)
+        unitnormal = self.getUnitNormal(normal)
+        distance = self.computeDistance(i, j)
+        move = (2*i.radius - distance)
+        i.rock.setX(i.rock.getX() - (unitnormal.getX() * (move/distance)))
+        i.rock.setY(i.rock.getY() - (unitnormal.getY() * (move/distance)))
+        

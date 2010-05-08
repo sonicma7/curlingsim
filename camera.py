@@ -34,6 +34,10 @@ class Camera(DirectObject):
         #if self.world.rocksMoving:
         #    self.currentView = self.postShotView
         #    self.shotReset = False
+        if (self.currentView == self.topView or self.currentView == self.topCloseView or self.currentView == self.world.aimBroom.aimed) and self.world.rocksMoving == False:
+            self.world.aimBroom.showBroom()
+        else:
+            self.world.aimBroom.hideBroom()
         if self.currentView == self.shotView:
             base.camera.setPos(0,-90,20)
             base.camera.setHpr(0,-20,0)

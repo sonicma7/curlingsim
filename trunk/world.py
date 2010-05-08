@@ -26,6 +26,7 @@ class World(DirectObject):
         self.camera = camera.Camera(self)
         self.hud = hud.HUD(self)
         self.sweepingBrooms = broom.Broom(self)
+        self.aimBroom = broom.AimBroom(self)
         id = str(unique_id())
         self.currentRock = rock.Rock("Red", id, self)        
         self.activeRocks = []       
@@ -38,7 +39,7 @@ class World(DirectObject):
         
         self.keyMap = {"push":0}  
 
-        self.accept("k", self.pushRock)    
+        self.accept("space", self.pushRock)    
         #self.accept("k-up", self.setKey, ["push", 0])
         self.accept('escape', sys.exit)
         self.accept("1", self.camera.setCamera,[1])
@@ -50,8 +51,8 @@ class World(DirectObject):
         self.accept("arrow_down", self.hud.updateThrust,[-1])        
         self.accept("arrow_right", self.hud.updateSpin,[1]) 
         self.accept("arrow_left", self.hud.updateSpin,[-1])
-        self.accept("mouse1", self.sweepingBrooms.setSweep,[True])
-        self.accept("mouse1-up", self.sweepingBrooms.setSweep,[False])
+        self.accept("mouse1", self.determineMouseAction,[True])
+        self.accept("mouse1-up", self.determineMouseAction,[False])
         
         taskMgr.add(self.update, "World-Update")
 
@@ -61,25 +62,37 @@ class World(DirectObject):
         
     def calculateVelocity(self): #Calculates the Vec3 velocity of the stone
         return Vec3(0,self.hud.thrust*.01,0) +self.currentRock.velocity
-            
-    def pushRock(self):
-        id = str(unique_id()) 
-        self.turn += 1                  
-        self.currentRock.spin = self.hud.spin*.5
-        self.currentRock.velocity = self.calculateVelocity()
-        self.currentRock.findTangent()
-        self.activeRocks.append(self.currentRock)
-        if self.currentRock.color == "Red":
-            self.currentRock = rock.Rock("Yellow", id, self)
-        else:    
-            self.currentRock = rock.Rock("Red", id, self)
-        #self.camera.changeView()
-        for i in self.activeRocks:
-            i.collideDict[self.currentRock.id] = False
-            self.currentRock.collideDict[i.id] = False
-        if self.turn == 16:
-            print "UPDATE SCORES"
         
+    def determineMouseAction(self,key):
+        if self.rocksMoving:      
+            self.sweepingBrooms.setSweep(key)
+        else:
+            self.sweepingBrooms.setSweep(False)
+            
+        if key == True and self.rocksMoving == False and (self.camera.currentView == self.camera.topView or self.camera.currentView == self.camera.topCloseView):
+            if self.aimBroom.aimed == False:
+                self.aimBroom.aimed = True
+            elif self.aimBroom.aimed == True:
+                self.aimBroom.aimed = False
+                                          
+    def pushRock(self):                         
+        if self.aimBroom.aimed == True:
+            id = str(unique_id()) 
+            self.turn += 1            
+            self.currentRock.spin = self.hud.spin*.5
+            self.currentRock.velocity = self.calculateVelocity()
+            self.activeRocks.append(self.currentRock)
+            if self.currentRock.color == "Red":
+                self.currentRock = rock.Rock("Yellow", id, self)
+            else:    
+                self.currentRock = rock.Rock("Red", id, self)
+            #self.camera.changeView()
+            for i in self.activeRocks:
+                i.collideDict[self.currentRock.id] = False
+                self.currentRock.collideDict[i.id] = False
+            if self.turn == 16:
+                print "UPDATE SCORES"
+      
     def update(self, task):
         if self.turn == 16 and self.rocksMoving == False:
             self.camera.setCamera(5)
@@ -93,6 +106,7 @@ class World(DirectObject):
         self.camera.Update()
         self.sweepingBrooms.Update()
         self.removeOutofBoundsRocks()
+        self.aimBroom.update()
         self.hud.Update()
         return task.cont
         

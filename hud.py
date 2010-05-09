@@ -35,6 +35,15 @@ class HUD(object):
         self.spin += key
         self.spinText["text"] = "Spin: " + str(self.spin)
         
+    def updateScore(self,scoreColor,score):
+        if scoreColor == "Red":
+            self.redScore += score
+            self.redScoreText["text"] = "Red Score: " + str(self.redScore)
+        else:
+            self.yellowScore += score
+            self.yellowScoreText["text"] = "Yellow Score: " + str(self.yellowScore)
+            
+        
         
     
         

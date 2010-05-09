@@ -54,10 +54,14 @@ class Camera(DirectObject):
             base.camera.setPos(rockPos.getX(),rockPos.getY(),rockPos.getZ()+.5)
             base.camera.setHpr(rockHpr)
         if self.currentView == self.followView:
-            try: 
-                rockPos = self.world.activeRocks[-1].rock.getPos()
-                rockHpr = self.world.activeRocks[-1].rock.getHpr()
-            except: 
+            if self.world.rocksMoving == True:
+                try: 
+                    rockPos = self.world.activeRocks[-1].rock.getPos()
+                    rockHpr = self.world.activeRocks[-1].rock.getHpr()
+                except: 
+                    rockPos = self.world.currentRock.rock.getPos()
+                    rockHpr = self.world.currentRock.rock.getHpr()
+            else:
                 rockPos = self.world.currentRock.rock.getPos()
                 rockHpr = self.world.currentRock.rock.getHpr()
             base.camera.setPos(0,rockPos.getY()-30,10)

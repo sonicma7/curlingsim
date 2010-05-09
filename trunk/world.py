@@ -34,6 +34,7 @@ class World(DirectObject):
         self.rink.setScale(1)
         self.rink.reparentTo(render)
         self.turn = 0
+        self.end = 1
         
         self.rocksMoving = False
         
@@ -55,6 +56,8 @@ class World(DirectObject):
         self.accept("mouse1-up", self.determineMouseAction,[False])
         
         taskMgr.add(self.update, "World-Update")
+        
+        self.testing = True #Set to true so some gameplay features are modified for testing (or other fun things)
 
     
     def setKey(self, key, value):
@@ -64,6 +67,16 @@ class World(DirectObject):
         return Vec3(0,self.hud.thrust*.01,0) +self.currentRock.velocity
         
     def determineMouseAction(self,key):
+        if self.turn == 16:
+            self.clearRocks()
+            self.turn = 0
+            self.end += 1
+            if self.end % 2 == 1:                
+                self.currentRock = rock.Rock("Red", id, self)
+            else:
+                self.currentRock = rock.Rock("Yellow", id, self)
+            self.camera.setCamera(1)
+            return
         if self.rocksMoving:      
             self.sweepingBrooms.setSweep(key)
         else:
@@ -76,37 +89,62 @@ class World(DirectObject):
                 self.aimBroom.aimed = False
                                           
     def pushRock(self):                         
-        if self.aimBroom.aimed == True:
+        #if self.aimBroom.aimed == True:
+        if self.turn != 16 and (self.rocksMoving == False or self.testing == True):
             id = str(unique_id()) 
-            self.turn += 1            
+            self.turn += 1 
+            self.rocksMoving = True           
             self.currentRock.spin = self.hud.spin*.5
             self.currentRock.velocity = self.calculateVelocity()
             self.activeRocks.append(self.currentRock)
-            if self.currentRock.color == "Red":
-                self.currentRock = rock.Rock("Yellow", id, self)
-            else:    
-                self.currentRock = rock.Rock("Red", id, self)
+            if self.turn != 16:
+                if self.currentRock.color == "Red":
+                    self.currentRock = rock.Rock("Yellow", id, self)
+                else:    
+                    self.currentRock = rock.Rock("Red", id, self)
             #self.camera.changeView()
             for i in self.activeRocks:
                 i.collideDict[self.currentRock.id] = False
                 self.currentRock.collideDict[i.id] = False
-            if self.turn == 16:
-                print "UPDATE SCORES"
+                
+    def calculateScores(self):
+        for i in self.activeRocks:
+            i.distanceToButton = self.computeDistanceToButton(i)
+        self.activeRocks = sorted(self.activeRocks,self.sortByDistance)
+        score = 0
+        scoreColor = self.activeRocks[0].color
+        for i in self.activeRocks:
+            if i.color == scoreColor and i.distanceToButton <= 11.857:
+                score += 1
+            else:
+                break
+        self.hud.updateScore(scoreColor,score)
+            
+            
+    def sortByDistance(self,a,b):
+        if a.distanceToButton > b.distanceToButton:
+            return 1
+        return -1
       
     def update(self, task):
+        self.camera.Update()
         if self.turn == 16 and self.rocksMoving == False:
-            self.camera.setCamera(5)
+            self.camera.setCamera(3)
+            self.aimBroom.hideBroom()
+            self.sweepingBrooms.hideBroom()
+            if self.activeRocks != []:
+                if self.activeRocks[0].distanceToButton == 100:
+                    self.calculateScores()
         else:
             self.rocksMoving = False         
             for i in self.activeRocks:
                 i.Update()
                 if i.velocity.getX() != 0 or i.velocity.getY() != 0:
                     self.rocksMoving = True
-        self.checkCollisions()
-        self.camera.Update()
-        self.sweepingBrooms.Update()
-        self.removeOutofBoundsRocks()
-        self.aimBroom.update()
+            self.checkCollisions()
+            self.sweepingBrooms.Update()
+            self.removeOutofBoundsRocks()
+            self.aimBroom.update()
         self.hud.Update()
         return task.cont
         
@@ -119,6 +157,11 @@ class World(DirectObject):
             #print delete,self.activeRocks
             self.activeRocks[delete[i]-i].rock.removeNode()
             self.activeRocks.pop(delete[i]-i)
+            
+    def clearRocks(self):
+        for i in xrange(len(self.activeRocks)):
+            self.activeRocks[0].rock.removeNode()
+            self.activeRocks.pop(0)
         
     def checkCollisions(self):
         for i in self.activeRocks:
@@ -146,6 +189,15 @@ class World(DirectObject):
         ay = a.rock.getPos().getY()
         bx = b.rock.getPos().getX()
         by = b.rock.getPos().getY()
+        dx = ax-bx
+        dy = ay-by
+        return math.sqrt(dx*dx+dy*dy)
+        
+    def computeDistanceToButton(self, a):
+        ax = a.rock.getPos().getX()
+        ay = a.rock.getPos().getY()
+        bx = 0
+        by = 41
         dx = ax-bx
         dy = ay-by
         return math.sqrt(dx*dx+dy*dy)

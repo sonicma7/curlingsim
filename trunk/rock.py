@@ -34,6 +34,7 @@ class Rock(DirectObject):
 		self.move = False
 		self.collideDict = {}
 		self.tangent = None
+		self.distanceToButton = 100
 
 		self.keyMap = {"left":0, "right":0, "forward":0, "back":0, "headlight":0, "fire":0}
 		
@@ -57,7 +58,7 @@ class Rock(DirectObject):
 			self.velocity.setX(self.velocity.getX() + acceleration * dt)
 		else:
 			pass
-		
+		self.findTangent()		
 		
 		if(self.velocity.getY() > 0):
 			self.rock.setPos(self.rock.getX() + (self.tangent.getX() * self.spin * self.radius * dt * -1), self.rock.getY() + (self.tangent.getY() * self.spin * self.radius * dt * -1), self.rock.getZ())

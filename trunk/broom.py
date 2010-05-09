@@ -39,12 +39,23 @@ class Broom(DirectObject):
     def setSweep(self,key):
         self.sweep = key
 
+    def hideBroom(self):
+        self.broom1.reparentTo(hidden) 
+        self.broom2.reparentTo(hidden)
         
+    def showBroom(self):
+        self.broom1.reparentTo(render) 
+        self.broom2.reparentTo(render)
+                
     def Update(self):
-        try: 
-            rockPos = self.world.activeRocks[-1].rock.getPos()
-            rock = self.world.activeRocks[-1] 
-        except: 
+        if self.world.rocksMoving == True:
+            try: 
+                rockPos = self.world.activeRocks[-1].rock.getPos()
+                rock = self.world.activeRocks[-1] 
+            except: 
+                rockPos = self.world.currentRock.rock.getPos()
+                rock = self.world.currentRock
+        else:
             rockPos = self.world.currentRock.rock.getPos()
             rock = self.world.currentRock
         self.broom1.setY(rockPos.getY()+1)   

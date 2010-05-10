@@ -23,13 +23,13 @@ class Rock(DirectObject):
 		self.rock = loader.loadModel("art/Rock "+color+".egg")
 		self.rock.setScale(1)
 		self.rock.setZ(self.rock.getZ()+.7)
-		self.rock.setY(self.rock.getY() - 60)
+		self.rock.setY(self.rock.getY() - 37)
 		self.rock.reparentTo(render)
 		self.velocity = Vec3(0,0.750,0)
 		self.spin = 0
 		self.friction = 0.0168
 		self.mass = 18
-		self.radius = 0.75
+		self.radius = 0.502158
 		self.gravity = 9.81
 		self.move = False
 		self.collideDict = {}

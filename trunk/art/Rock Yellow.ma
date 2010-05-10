@@ -1,6 +1,6 @@
 //Maya ASCII 2009 scene
 //Name: Rock Yellow.ma
-//Last modified: Sun, May 09, 2010 06:16:42 PM
+//Last modified: Sun, May 09, 2010 11:41:46 PM
 //Codeset: 1252
 requires maya "2009";
 currentUnit -l centimeter -a degree -t film;
@@ -11,13 +11,13 @@ fileInfo "cutIdentifier" "200809110030-734661";
 fileInfo "osv" "Microsoft Windows XP Service Pack 3 (Build 2600)\n";
 createNode transform -s -n "persp";
 	setAttr ".v" no;
-	setAttr ".t" -type "double3" 2.3959278762596763 10.643592520299089 6.8591577674723645 ;
+	setAttr ".t" -type "double3" 0.93222466621474043 7.3738424608993309 3.8581214530189061 ;
 	setAttr ".r" -type "double3" -44.400000000002379 -2133.9999999997472 1.7693456551956884e-015 ;
 	setAttr ".rpt" -type "double3" -7.534531043039e-017 5.3031673962247849e-017 -2.3534150420547368e-017 ;
 createNode camera -s -n "perspShape" -p "persp";
 	setAttr -k off ".v" no;
 	setAttr ".fl" 34.999999999999979;
-	setAttr ".coi" 11.041929967290905;
+	setAttr ".coi" 6.3686108578453462;
 	setAttr ".imn" -type "string" "persp";
 	setAttr ".den" -type "string" "persp_depth";
 	setAttr ".man" -type "string" "persp_mask";
@@ -2518,7 +2518,7 @@ createNode mesh -n "pCylinderShape2" -p "transform2";
 	setAttr ".cvd" -type "dataPolyComponent" Index_Data Vertex 0 ;
 createNode transform -n "polySurface1";
 	setAttr ".r" -type "double3" 0 270 0 ;
-	setAttr ".s" -type "double3" 0.25 0.25 0.25 ;
+	setAttr ".s" -type "double3" 0.176 0.176 0.176 ;
 createNode mesh -n "polySurfaceShape1" -p "polySurface1";
 	addAttr -ci true -sn "mso" -ln "miShadingSamplesOverride" -min 0 -max 1 -at "bool";
 	addAttr -ci true -sn "msh" -ln "miShadingSamples" -min 0 -smx 8 -at "float";

@@ -21,7 +21,10 @@ class Camera(DirectObject):
         #else:
         #    self.currentView = key
         #    self.postShotView = key
-        self.currentView = key 
+        if self.world.turn == 16 and self.world.rocksMoving == False:
+            self.currentView = 3
+        else:
+            self.currentView = key 
         
     def changeView(self):
         #self.currentView = self.postShotView
@@ -54,16 +57,16 @@ class Camera(DirectObject):
             base.camera.setPos(rockPos.getX(),rockPos.getY(),rockPos.getZ()+.5)
             base.camera.setHpr(rockHpr)
         if self.currentView == self.followView:
-            if self.world.rocksMoving == True:
-                try: 
-                    rockPos = self.world.activeRocks[-1].rock.getPos()
-                    rockHpr = self.world.activeRocks[-1].rock.getHpr()
-                except: 
-                    rockPos = self.world.currentRock.rock.getPos()
-                    rockHpr = self.world.currentRock.rock.getHpr()
-            else:
+            #if self.world.rocksMoving == True:
+            try: 
+                rockPos = self.world.activeRocks[-1].rock.getPos()
+                rockHpr = self.world.activeRocks[-1].rock.getHpr()
+            except: 
                 rockPos = self.world.currentRock.rock.getPos()
                 rockHpr = self.world.currentRock.rock.getHpr()
+            #else:
+            #    rockPos = self.world.currentRock.rock.getPos()
+            #    rockHpr = self.world.currentRock.rock.getHpr()
             base.camera.setPos(0,rockPos.getY()-10,3)
             base.camera.lookAt(rockPos) 
         if self.currentView == self.topCloseView:

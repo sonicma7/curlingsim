@@ -51,8 +51,8 @@ class World(DirectObject):
         self.accept("4", self.camera.setCamera,[4]) 
         self.accept("9", self.camera.setCamera,[9])  
         self.accept("d", self.setDebugging)
-        self.accept("arrow_up", self.hud.updateThrust,[1]) 
-        self.accept("arrow_down", self.hud.updateThrust,[-1])        
+        self.accept("arrow_up", self.hud.updateWeight,[1]) 
+        self.accept("arrow_down", self.hud.updateWeight,[-1])        
         self.accept("arrow_right", self.hud.updateSpin,[1]) 
         self.accept("arrow_left", self.hud.updateSpin,[-1])
         self.accept("mouse1", self.determineMouseAction,[True])
@@ -82,19 +82,24 @@ class World(DirectObject):
             broomPos = self.aimBroom.broom.getPos()
         velocity = broomPos-self.currentRock.rock.getPos()
         velocity.normalize()
+        velocity.setY(velocity.getY()*.7 + (self.hud.weight *.01))
+        print velocity
         return velocity
         
     def determineMouseAction(self,key):
+        if self.gameOver == True:
+            return
         if self.turn == 16 and self.rocksMoving == False:
             self.turn = 0
             self.end += 1
             self.hud.updateEndCount()
-            if self.end >= self.endsToPlay + 1 and self.hud.yellowScore != self.hud.redScore:
-                self.gameOver = True
-                self.camera.setCamera(3)
-                return
+            #if self.end >= self.endsToPlay + 1 and self.hud.yellowScore != self.hud.redScore:
+            #    self.gameOver = True
+            #    self.end -= 1
+            #    self.camera.setCamera(3)
+            #    return
             if self.activeRocks == []: #Blank End
-                print "Blank end"
+                #print "Blank end"
                 self.currentRock = rock.Rock(self.lastEndColor, id, self)                 
             elif self.lastEndColor == "Yellow":                
                 self.currentRock = rock.Rock("Red", id, self)
@@ -124,7 +129,6 @@ class World(DirectObject):
             self.rocksMoving = True           
             self.currentRock.spin = self.hud.spin*.5
             self.currentRock.velocity = self.calculateVelocity()
-            self.currentRock.velocity.setY(self.currentRock.velocity.getY() + (self.hud.thrust * 0.1))
             self.aimBroom.aimed = False
             self.hud.resetShot()
             self.activeRocks.append(self.currentRock)
@@ -146,7 +150,7 @@ class World(DirectObject):
         score = 0
         scoreColor = self.activeRocks[0].color
         for i in self.activeRocks:
-            if i.color == scoreColor and i.distanceToButton <= 12:
+            if i.color == scoreColor and i.distanceToButton <= 6.25:
                 score += 1
             else:
                 break
@@ -169,6 +173,9 @@ class World(DirectObject):
             if self.activeRocks != []:
                 if self.activeRocks[0].distanceToButton == 100:
                     self.calculateScores()
+            if self.end >= self.endsToPlay and self.hud.yellowScore != self.hud.redScore:
+                self.gameOver = True
+                self.end -= 1
         else:
             self.rocksMoving = False         
             for i in self.activeRocks:
@@ -184,8 +191,8 @@ class World(DirectObject):
         
     def removeOutofBoundsRocks(self):
         delete = []
-        for i in xrange(len(self.activeRocks)):
-            if self.activeRocks[i].rock.getX() > 11.857 or self.activeRocks[i].rock.getX() < -11.857 or self.activeRocks[i].rock.getY() > 65:
+        for i in xrange(len(self.activeRocks)):                                                                                                                                                                        
+            if self.activeRocks[i].rock.getX() > 7.253 or self.activeRocks[i].rock.getX() < -7.253 or self.activeRocks[i].rock.getY() > 63.5 or (self.rocksMoving == False and self.activeRocks[i].rock.getY() < 36.65):
                 delete.append(i)
         for i in xrange(len(delete)):
             #print delete,self.activeRocks

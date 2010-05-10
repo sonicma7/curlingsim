@@ -232,10 +232,10 @@ class World(DirectObject):
             direction = i.velocity
             unitdir = self.getUnitNormal(direction)
             force = i.velocity * i.mass
-            normal = self.findNormal(j, i)
+            normal = self.findNormal(i, j)
             unitnormal = self.getUnitNormal(normal)
             collisionpoint = unitnormal
-            angle = math.acos(direction.dot(collisionpoint))
+            angle = math.acos(collisionpoint.dot(direction))
             print math.degrees(angle)
         else:
             direction = j.velocity

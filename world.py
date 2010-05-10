@@ -284,6 +284,8 @@ class World(DirectObject):
             collision = unitnormal.dot(unitdir)
             if(collision > 1 or collision < -1):
                 return
+            if(collision == -1 or collision == 1):
+                collision = 0
             angle = math.acos(collision)
             torque = force * i.radius * math.sin(angle)
             scalartorque = self.computeScalar(torque)
@@ -299,6 +301,8 @@ class World(DirectObject):
             collision = unitnormal.dot(unitdir)
             if(collision > 1 or collision < -1):
                 return
+            if(collision == -1 or collision == 1):
+                collision = 0
             angle = math.acos(collision)
             torque = force * j.radius * math.sin(angle)
             scalartorque = self.computeScalar(torque)

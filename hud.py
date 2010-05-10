@@ -1,18 +1,19 @@
 from direct.gui.OnscreenImage import OnscreenImage
 from pandac.PandaModules import TransparencyAttrib
 from pandac.PandaModules import TextNode
-from direct.gui.DirectGui import *
+from direct.gui.DirectGui import * 
+from pandac.PandaModules import * 
 
 class HUD(object):
     def __init__(self,world):     
         self.world = world
-        self.thrust = 0
+        self.weight = 0
         self.spin = 0
         self.yellowScore = 0
         self.redScore = 0
         self.endCount = 1
         
-        self.thrustText = OnscreenText(text=("Thrust: " + str(self.thrust)),
+        self.weightText = OnscreenText(text=("Weight: " + str(self.weight)),
                               style=1, fg=(0,0,1,1),
                               pos=(-1.3,0.87), scale = .07, mayChange = 1, align = TextNode.ALeft)
         self.spinText = OnscreenText(text=("Spin: " + str(self.spin)),
@@ -31,21 +32,30 @@ class HUD(object):
                               pos=(-1.3,0.47), scale = .07, mayChange = 1, align = TextNode.ALeft)
     
     def Update(self):
-        pass
+        if self.world.gameOver == True:
+            if self.yellowScore < self.redScore:
+                winner = "Red"
+                fg = (1,0,0,1)
+            else:
+                winner = "Yellow"
+                fg = (1,1,0,1)
+            winnerText = OnscreenText(text=(winner + " wins!"),
+                              style=1, fg=fg, pos=(0,0),scale = .25)
+                               
         
     def resetShot(self):
-        self.thrust = 0
+        self.weight = 0
         self.spin = 0
-        self.updateThrust(0)
+        self.updateWeight(0)
         self.updateSpin(0)
         
     def updateEndCount(self):
         self.endCount += 1                                      
         self.endCountText["text"] = "End: " + str(self.endCount)
         
-    def updateThrust(self, key):
-        self.thrust += key
-        self.thrustText["text"] = "Thrust: " + str(self.thrust)
+    def updateWeight(self, key):
+        self.weight += key
+        self.weightText["text"] = "Weight: " + str(self.weight)
         
     def updateSpin(self, key):
         self.spin += key

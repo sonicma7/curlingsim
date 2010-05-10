@@ -124,6 +124,7 @@ class World(DirectObject):
             self.rocksMoving = True           
             self.currentRock.spin = self.hud.spin*.5
             self.currentRock.velocity = self.calculateVelocity()
+            self.currentRock.velocity.setY(self.currentRock.velocity.getY() + (self.hud.thrust * 0.1))
             self.aimBroom.aimed = False
             self.hud.resetShot()
             self.activeRocks.append(self.currentRock)
@@ -204,8 +205,8 @@ class World(DirectObject):
                         if i.collideDict[j.id] == False:
                             j.collideDict[i.id] = True
                             self.separateRocks(i, j)
-                            self.computeCollision(i, j)
                             self.computeRotation(i, j)
+                            self.computeCollision(i, j)
 
                     else:
                         if i.collideDict[j.id] == True:
@@ -235,6 +236,9 @@ class World(DirectObject):
         dy = ay-by
         return math.sqrt(dx*dx+dy*dy)
         
+    def computeScalar(self, a):
+        return math.sqrt(pow(a.getX(),2) + pow(a.getY(),2))
+        
     def computeCollision(self, i, j):
         normal = self.findNormal(i, j)
         unitnormal = self.getUnitNormal(normal)
@@ -261,21 +265,34 @@ class World(DirectObject):
         i.rock.setY(i.rock.getY() - (unitnormal.getY() * (move/distance)))
         
     def computeRotation(self, i, j):
-        if i.velocity.getY() > 0:
-            direction = i.velocity
+        if i.velocity.getY() > 0 or i.velocity.getY() < 0:
+            direction = i.velocity * -1
             unitdir = self.getUnitNormal(direction)
             force = i.velocity * i.mass
             normal = self.findNormal(i, j)
             unitnormal = self.getUnitNormal(normal)
-            collisionpoint = unitnormal
-            angle = math.acos(collisionpoint.dot(direction))
-            print math.degrees(angle)
+            collision = unitnormal.dot(unitdir)
+            if(collision > 1 or collision < -1):
+                return
+            angle = math.acos(collision)
+            torque = force * i.radius * math.sin(angle)
+            scalartorque = self.computeScalar(torque)
+            i.spin = i.spin - (scalartorque/2)
+            j.spin = scalartorque/2
+             
         else:
-            direction = j.velocity
+            direction = j.velocity * -1
             unitdir = self.getUnitNormal(direction)
             force = j.velocity * j.mass
-            normal = self.findNormal(i, j)
+            normal = self.findNormal(j, i)
             unitnormal = self.getUnitNormal(normal)
-            collisionpoint = unitnormal
-            angle = math.acos(direction.dot(collisionpoint))
-            print math.degrees(angle)
+            collision = unitnormal.dot(unitdir)
+            if(collision > 1 or collision < -1):
+                return
+            angle = math.acos(collision)
+            torque = force * j.radius * math.sin(angle)
+            scalartorque = self.computeScalar(torque)
+            j.spin = j.spin - (scalartorque/2)
+            i.spin = scalartorque/2
+
+            

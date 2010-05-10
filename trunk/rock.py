@@ -52,12 +52,12 @@ class Rock(DirectObject):
 		frictionforce = normalforce * self.friction
 		acceleration = frictionforce / self.mass
 		self.velocity.setY(self.velocity.getY() - acceleration * dt)
-		if self.velocity.getX() > 0:
-			self.velocity.setX(self.velocity.getX() - acceleration * dt)
-		elif self.velocity.getX() < 0:
-			self.velocity.setX(self.velocity.getX() + acceleration * dt)
-		else:
-			pass
+		#if self.velocity.getX() > 0:
+		#	self.velocity.setX(self.velocity.getX() - acceleration * dt)
+		#elif self.velocity.getX() < 0:
+		#	self.velocity.setX(self.velocity.getX() + acceleration * dt)
+		#else:
+		#	pass
 		self.findTangent()		
 		
 		if(self.velocity.getY() > 0):

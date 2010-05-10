@@ -28,6 +28,9 @@ class World(DirectObject):
         self.sweepingBrooms = broom.Broom(self)
         self.aimBroom = broom.AimBroom(self)
         id = str(unique_id())
+        self.preload = rock.Rock("Yellow",id,self)
+        self.preload.rock.removeNode()
+        del self.preload 
         self.currentRock = rock.Rock("Red", id, self)
         self.lastEndColor = "Red"        
         self.activeRocks = []       

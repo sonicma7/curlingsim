@@ -29,7 +29,7 @@ class Rock(DirectObject):
         self.spin = 0
         self.friction = 0.0168
         self.mass = 18
-        self.radius = 0.502158
+        self.radius = 0.475
         self.gravity = 9.81
         self.move = False
         self.collideDict = {}

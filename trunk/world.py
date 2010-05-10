@@ -28,13 +28,15 @@ class World(DirectObject):
         self.sweepingBrooms = broom.Broom(self)
         self.aimBroom = broom.AimBroom(self)
         id = str(unique_id())
-        self.currentRock = rock.Rock("Red", id, self)        
+        self.currentRock = rock.Rock("Red", id, self)
+        self.lastEndColor = "Red"        
         self.activeRocks = []       
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
         self.rink.reparentTo(render)
         self.turn = 0
         self.end = 1
+        self.endsToPlay = 8
         
         self.rocksMoving = False
         
@@ -47,7 +49,8 @@ class World(DirectObject):
         self.accept("2", self.camera.setCamera,[2])
         self.accept("3", self.camera.setCamera,[3]) 
         self.accept("4", self.camera.setCamera,[4]) 
-        self.accept("9", self.camera.setCamera,[9])
+        self.accept("9", self.camera.setCamera,[9])  
+        self.accept("d", self.setDebugging)
         self.accept("arrow_up", self.hud.updateThrust,[1]) 
         self.accept("arrow_down", self.hud.updateThrust,[-1])        
         self.accept("arrow_right", self.hud.updateSpin,[1]) 
@@ -57,24 +60,49 @@ class World(DirectObject):
         
         taskMgr.add(self.update, "World-Update")
         
-        self.testing = True #Set to true so some gameplay features are modified for testing (or other fun things)
+        self.debugging = True #Set to true so some gameplay features are modified for testing (or other fun things)
+        
+        self.gameOver = False
+        
 
     
     def setKey(self, key, value):
         self.keyMap[key] = value
         
+    def setDebugging(self):
+        if self.debugging == True:
+            self.debugging = False
+        else:
+            self.debugging = True
+        
     def calculateVelocity(self): #Calculates the Vec3 velocity of the stone
-        return Vec3(0,self.hud.thrust*.01,0) +self.currentRock.velocity
+        if self.aimBroom.aimed == False:
+            broomPos = Vec3(0,41,.7)
+        else:
+            broomPos = self.aimBroom.broom.getPos()
+        velocity = broomPos-self.currentRock.rock.getPos()
+        velocity.normalize()
+        return velocity
         
     def determineMouseAction(self,key):
-        if self.turn == 16:
-            self.clearRocks()
+        if self.turn == 16 and self.rocksMoving == False:
             self.turn = 0
             self.end += 1
-            if self.end % 2 == 1:                
+            self.hud.updateEndCount()
+            if self.end >= self.endsToPlay + 1 and self.hud.yellowScore != self.hud.redScore:
+                self.gameOver = True
+                self.camera.setCamera(3)
+                return
+            if self.activeRocks == []: #Blank End
+                print "Blank end"
+                self.currentRock = rock.Rock(self.lastEndColor, id, self)                 
+            elif self.lastEndColor == "Yellow":                
                 self.currentRock = rock.Rock("Red", id, self)
+                self.lastEndColor = "Red"
             else:
                 self.currentRock = rock.Rock("Yellow", id, self)
+                self.lastEndColor = "Yellow"
+            self.clearRocks()
             self.camera.setCamera(1)
             return
         if self.rocksMoving:      
@@ -90,13 +118,16 @@ class World(DirectObject):
                                           
     def pushRock(self):                         
         #if self.aimBroom.aimed == True:
-        if self.turn != 16 and (self.rocksMoving == False or self.testing == True):
+        if self.turn != 16 and (self.rocksMoving == False or self.debugging == True):
             id = str(unique_id()) 
             self.turn += 1 
             self.rocksMoving = True           
             self.currentRock.spin = self.hud.spin*.5
             self.currentRock.velocity = self.calculateVelocity()
+            self.aimBroom.aimed = False
+            self.hud.resetShot()
             self.activeRocks.append(self.currentRock)
+            self.sweepingBrooms.sweepingRock = self.activeRocks[-1]
             if self.turn != 16:
                 if self.currentRock.color == "Red":
                     self.currentRock = rock.Rock("Yellow", id, self)
@@ -128,7 +159,9 @@ class World(DirectObject):
       
     def update(self, task):
         self.camera.Update()
-        if self.turn == 16 and self.rocksMoving == False:
+        if self.gameOver == True:
+            pass
+        elif self.turn == 16 and self.rocksMoving == False:
             self.camera.setCamera(3)
             self.aimBroom.hideBroom()
             self.sweepingBrooms.hideBroom()
@@ -143,8 +176,8 @@ class World(DirectObject):
                     self.rocksMoving = True
             self.checkCollisions()
             self.sweepingBrooms.Update()
+            self.aimBroom.update()                   
             self.removeOutofBoundsRocks()
-            self.aimBroom.update()
         self.hud.Update()
         return task.cont
         

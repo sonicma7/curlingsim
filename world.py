@@ -153,7 +153,7 @@ class World(DirectObject):
         score = 0
         scoreColor = self.activeRocks[0].color
         for i in self.activeRocks:
-            if i.color == scoreColor and i.distanceToButton <= 6.25:
+            if i.color == scoreColor and i.distanceToButton <= 6.35:
                 score += 1
             else:
                 break
@@ -195,7 +195,7 @@ class World(DirectObject):
     def removeOutofBoundsRocks(self):
         delete = []
         for i in xrange(len(self.activeRocks)):                                                                                                                                                                        
-            if self.activeRocks[i].rock.getX() > 7.253 or self.activeRocks[i].rock.getX() < -7.253 or self.activeRocks[i].rock.getY() > 63.5 or (self.rocksMoving == False and self.activeRocks[i].rock.getY() < 36.65):
+            if self.activeRocks[i].rock.getX() > 7.28 or self.activeRocks[i].rock.getX() < -7.28 or self.activeRocks[i].rock.getY() > 63.48 or (self.rocksMoving == False and self.activeRocks[i].rock.getY() < 36.6):
                 delete.append(i)
         for i in xrange(len(delete)):
             #print delete,self.activeRocks

@@ -77,7 +77,7 @@ class World(DirectObject):
         
     def calculateVelocity(self): #Calculates the Vec3 velocity of the stone
         if self.aimBroom.aimed == False:
-            broomPos = Vec3(0,41,.7)
+            broomPos = Vec3(0,57,.7)
         else:
             broomPos = self.aimBroom.broom.getPos()
         velocity = broomPos-self.currentRock.rock.getPos()
@@ -145,7 +145,7 @@ class World(DirectObject):
         score = 0
         scoreColor = self.activeRocks[0].color
         for i in self.activeRocks:
-            if i.color == scoreColor and i.distanceToButton <= 11.857:
+            if i.color == scoreColor and i.distanceToButton <= 12:
                 score += 1
             else:
                 break
@@ -230,7 +230,7 @@ class World(DirectObject):
         ax = a.rock.getPos().getX()
         ay = a.rock.getPos().getY()
         bx = 0
-        by = 41
+        by = 57
         dx = ax-bx
         dy = ay-by
         return math.sqrt(dx*dx+dy*dy)

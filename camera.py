@@ -39,10 +39,10 @@ class Camera(DirectObject):
         else:
             self.world.aimBroom.hideBroom()
         if self.currentView == self.shotView:
-            base.camera.setPos(0,-90,20)
-            base.camera.setHpr(0,-20,0)
+            base.camera.setPos(0,-60,13)
+            base.camera.setHpr(0,-15,0)
         if self.currentView == self.topView:
-            base.camera.setPos(0,29,100)
+            base.camera.setPos(0,40,100)
             base.camera.setHpr(180,-90,0)
         if self.currentView == self.rockView:
             try: 
@@ -64,10 +64,10 @@ class Camera(DirectObject):
             else:
                 rockPos = self.world.currentRock.rock.getPos()
                 rockHpr = self.world.currentRock.rock.getHpr()
-            base.camera.setPos(0,rockPos.getY()-30,10)
+            base.camera.setPos(0,rockPos.getY()-10,3)
             base.camera.lookAt(rockPos) 
         if self.currentView == self.topCloseView:
-            base.camera.setPos(0,41,50)
+            base.camera.setPos(0,57,30)
             base.camera.setHpr(180,-90,0)
     
     

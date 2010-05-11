@@ -22,7 +22,8 @@ def id_gen():
 unique_id = id_gen().next
 
 class World(DirectObject):
-    def __init__(self):
+    def __init__(self):        
+        self.turn = 0
         self.camera = camera.Camera(self)
         self.hud = hud.HUD(self)
         self.sweepingBrooms = broom.Broom(self)
@@ -37,7 +38,6 @@ class World(DirectObject):
         self.rink = loader.loadModel("art/Rink.egg")
         self.rink.setScale(1)
         self.rink.reparentTo(render)
-        self.turn = 0
         self.end = 1
         self.endsToPlay = 8
         
@@ -86,7 +86,6 @@ class World(DirectObject):
         velocity = broomPos-self.currentRock.rock.getPos()
         velocity.normalize()
         velocity.setY(velocity.getY()*.7 + (self.hud.weight *.01))
-        print velocity
         return velocity
         
     def determineMouseAction(self,key):
@@ -94,6 +93,7 @@ class World(DirectObject):
             return
         if self.turn == 16 and self.rocksMoving == False:
             self.turn = 0
+            self.hud.updateTurn()
             self.end += 1
             self.hud.updateEndCount()
             #if self.end >= self.endsToPlay + 1 and self.hud.yellowScore != self.hud.redScore:
@@ -128,7 +128,8 @@ class World(DirectObject):
         #if self.aimBroom.aimed == True:
         if self.turn != 16 and (self.rocksMoving == False or self.debugging == True):
             id = str(unique_id()) 
-            self.turn += 1 
+            self.turn += 1
+            self.hud.updateTurn()
             self.rocksMoving = True           
             self.currentRock.spin = self.hud.spin*.5
             self.currentRock.velocity = self.calculateVelocity()
@@ -285,7 +286,7 @@ class World(DirectObject):
             if(collision > 1 or collision < -1):
                 return
             if(collision == -1 or collision == 1):
-                collision = 0
+                collision = -1
             angle = math.acos(collision)
             torque = force * i.radius * math.sin(angle)
             scalartorque = self.computeScalar(torque)
@@ -302,7 +303,7 @@ class World(DirectObject):
             if(collision > 1 or collision < -1):
                 return
             if(collision == -1 or collision == 1):
-                collision = 0
+                collision = -1
             angle = math.acos(collision)
             torque = force * j.radius * math.sin(angle)
             scalartorque = self.computeScalar(torque)

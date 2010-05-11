@@ -30,6 +30,11 @@ class HUD(object):
         self.endCountText = OnscreenText(text=("End: " + str(self.endCount)),
                               style=1, fg=(0,0,1,1),
                               pos=(-1.3,0.47), scale = .07, mayChange = 1, align = TextNode.ALeft)
+                
+        self.turnCountText = OnscreenText(text=("Turn: " + str(self.world.turn+1)),
+                              style=1, fg=(0,0,1,1),
+                              pos=(-1.3,0.37), scale = .07, mayChange = 1, align = TextNode.ALeft)
+
     
     def Update(self):
         if self.world.gameOver == True:
@@ -48,6 +53,11 @@ class HUD(object):
         self.spin = 0
         self.updateWeight(0)
         self.updateSpin(0)
+        
+    def updateTurn(self):
+        if self.world.turn != 16:
+            self.turnCountText["text"] = "Turn: " + str(self.world.turn+1)
+
         
     def updateEndCount(self):
         self.endCount += 1                                      

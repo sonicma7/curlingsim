@@ -6,4 +6,7 @@ aiming, sweeping, end completion conditions, and scoring.  Implemented the hud a
 
 The game requires Panda3D 1.7.0 to run, you can download it from http://www.panda3d.org/download.php
 
-This was submitted a second time late because we needed to convert the .doc to pdf
+To start the game run game.py with Panda3D 1.7.0 installed.
+
+
+© Mark Aversa, Jeremy Therrien

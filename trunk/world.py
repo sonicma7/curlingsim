@@ -1,3 +1,4 @@
+#Copyright Mark Aversa, Jeremy Therrien
 import direct.directbase.DirectStart
 from direct.showbase.DirectObject import DirectObject
 from pandac.PandaModules import *
@@ -13,6 +14,8 @@ from direct.gui.DirectGui import *
 
 import rock, camera, hud, broom
 
+
+#ID generator for the curling rocks.  Used with collision checking.
 def id_gen():
     k = 0
     while True:
@@ -21,7 +24,10 @@ def id_gen():
 
 unique_id = id_gen().next
 
+
 class World(DirectObject):
+    """The world that holds the rocks, brooms, and rink.  The game is updated through
+    this class and it handles collisions, throwing of the rock, and aiming of the rock."""
     def __init__(self):        
         self.turn = 0
         self.camera = camera.Camera(self)
@@ -68,16 +74,18 @@ class World(DirectObject):
         self.gameOver = False
         
 
-    
+    #Input
     def setKey(self, key, value):
         self.keyMap[key] = value
-        
+     
+    #Debugging mode
     def setDebugging(self):
         if self.debugging == True:
             self.debugging = False
         else:
             self.debugging = True
-        
+    
+    #calculates the velocity of the rock 
     def calculateVelocity(self): #Calculates the Vec3 velocity of the stone
         if self.aimBroom.aimed == False:
             broomPos = Vec3(0,57,.7)
@@ -88,6 +96,7 @@ class World(DirectObject):
         velocity.setY(velocity.getY()*.7 + (self.hud.weight *.01))
         return velocity
         
+    #Used for input of the mouse to determine throwing angle   
     def determineMouseAction(self,key):
         if self.gameOver == True:
             return
@@ -123,7 +132,8 @@ class World(DirectObject):
                 self.aimBroom.aimed = True
             elif self.aimBroom.aimed == True:
                 self.aimBroom.aimed = False
-                                          
+    
+    #Starts movement of the rock
     def pushRock(self):                         
         #if self.aimBroom.aimed == True:
         if self.turn != 16 and (self.rocksMoving == False or self.debugging == True):
@@ -147,6 +157,7 @@ class World(DirectObject):
                 i.collideDict[self.currentRock.id] = False
                 self.currentRock.collideDict[i.id] = False
                 
+    #Calculates scores at the end of the round            
     def calculateScores(self):
         for i in self.activeRocks:
             i.distanceToButton = self.computeDistanceToButton(i)
@@ -160,12 +171,13 @@ class World(DirectObject):
                 break
         self.hud.updateScore(scoreColor,score)
             
-            
+    #Sorts the rocks based on their distance
     def sortByDistance(self,a,b):
         if a.distanceToButton > b.distanceToButton:
             return 1
         return -1
       
+    #Update function, called every frame to update rocks, friction, brooms, and collisions
     def update(self, task):
         self.camera.Update()
         if self.gameOver == True:
@@ -193,6 +205,7 @@ class World(DirectObject):
         self.hud.Update()
         return task.cont
         
+    #removes the rocks that out of bounds of the rink
     def removeOutofBoundsRocks(self):
         delete = []
         for i in xrange(len(self.activeRocks)):                                                                                                                                                                        
@@ -202,12 +215,14 @@ class World(DirectObject):
             #print delete,self.activeRocks
             self.activeRocks[delete[i]-i].rock.removeNode()
             self.activeRocks.pop(delete[i]-i)
-            
+    
+    #Clears rocks at the end of the round
     def clearRocks(self):
         for i in xrange(len(self.activeRocks)):
             self.activeRocks[0].rock.removeNode()
             self.activeRocks.pop(0)
-        
+    
+    #checks for collisions between two rocks
     def checkCollisions(self):
         for i in self.activeRocks:
             for j in self.activeRocks:
@@ -222,13 +237,16 @@ class World(DirectObject):
                     else:
                         if i.collideDict[j.id] == True:
                             i.collideDict[j.id] = False
-                        
+    
+    #Finds the normal between two points
     def findNormal(self, a,b):
         return Vec3(b.rock.getPos().getX()-a.rock.getPos().getX(), b.rock.getPos().getY()-a.rock.getPos().getY(),0)
     
+    #Computes the unit value of the given vector
     def getUnitNormal(self, normal):
         return normal/(math.sqrt(pow(normal.getX(),2) + pow(normal.getY(),2)))
     
+    #Computes the distance between two rocks
     def computeDistance(self, a,b):
         ax = a.rock.getPos().getX()
         ay = a.rock.getPos().getY()
@@ -237,7 +255,8 @@ class World(DirectObject):
         dx = ax-bx
         dy = ay-by
         return math.sqrt(dx*dx+dy*dy)
-        
+    
+    #Computes the distance a rock is from the center
     def computeDistanceToButton(self, a):
         ax = a.rock.getPos().getX()
         ay = a.rock.getPos().getY()
@@ -247,9 +266,11 @@ class World(DirectObject):
         dy = ay-by
         return math.sqrt(dx*dx+dy*dy)
         
+    #Computes the scalar value of a vector
     def computeScalar(self, a):
         return math.sqrt(pow(a.getX(),2) + pow(a.getY(),2))
-        
+    
+    #Computes the new forces given each rock after they collide
     def computeCollision(self, i, j):
         normal = self.findNormal(i, j)
         unitnormal = self.getUnitNormal(normal)
@@ -266,7 +287,8 @@ class World(DirectObject):
         newtangvec2 = unittangent * tangvelo2
         i.velocity = newnormvec1 + newtangvec1
         j.velocity = newnormvec2 + newtangvec2
-        
+    
+    #Separates the rocks so they do not stick together after a collision
     def separateRocks(self, i, j):
         normal = self.findNormal(i, j)
         unitnormal = self.getUnitNormal(normal)
@@ -274,7 +296,8 @@ class World(DirectObject):
         move = (2*i.radius - distance)
         i.rock.setX(i.rock.getX() - (unitnormal.getX() * (move/distance)))
         i.rock.setY(i.rock.getY() - (unitnormal.getY() * (move/distance)))
-        
+    
+    #computes the new rotation of each rock after a collision
     def computeRotation(self, i, j):
         if i.velocity.getY() > 0 or i.velocity.getY() < 0:
             direction = i.velocity * -1

@@ -1,3 +1,4 @@
+#Copyright Mark Aversa, Jeremy Therrien
 import direct.directbase.DirectStart
 from direct.showbase.DirectObject import DirectObject
 from pandac.PandaModules import *
@@ -15,7 +16,11 @@ import world
 
 from pandac.PandaModules import Filename
 
+
 class Rock(DirectObject):
+    """Rock class that holds all the information pertaining to each rock.
+    The rocks position, velocity, acceleration, mass, radius, and the frictional
+    force acting on the rock are all stored here."""
     def __init__(self, color, id, world):
         self.id = id
         self.world = world
@@ -37,17 +42,21 @@ class Rock(DirectObject):
         self.distanceToButton = 100
 
         self.keyMap = {"left":0, "right":0, "forward":0, "back":0, "headlight":0, "fire":0}
-        
+     
+    #input
     def setkeyMap(self, keyMap):
         self.keyMap = keyMap        
 
+    #finds the tangent vector of the velocity
     def findTangent(self):
         unitvelo = self.velocity/(math.sqrt(pow(self.velocity.getX(),2) + pow(self.velocity.getY(),2)))
         self.tangent = Vec3(-unitvelo.getY(), unitvelo.getX(), 0)
     
+    #Gets the unit vector of a vector
     def getUnitNormal(self, normal):
         return normal/(math.sqrt(pow(normal.getX(),2) + pow(normal.getY(),2)))
 
+    #called every frame to update the position, velocity, and acceleration of a rock
     def Update(self):
         dt = globalClock.getDt()
         
@@ -59,7 +68,7 @@ class Rock(DirectObject):
             self.velocity.setY(self.velocity.getY() - (direction.getY() * acceleration * dt))
         
         if self.velocity.getX() != 0:
-        	self.velocity.setX(self.velocity.getX() - (direction.getX() * acceleration * dt * 2))
+            self.velocity.setX(self.velocity.getX() - (direction.getX() * acceleration * dt * 2))
         #elif self.velocity.getX() < 0:
         #	self.velocity.setX(self.velocity.getX() - (direction.getX() * acceleration * dt))
         

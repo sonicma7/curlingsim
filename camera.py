@@ -1,3 +1,4 @@
+#Copyright Mark Aversa, Jeremy Therrien
 from direct.showbase.DirectObject import DirectObject
 
 class Camera(DirectObject): 

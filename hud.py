@@ -1,3 +1,4 @@
+#Copyright Mark Aversa, Jeremy Therrien
 from direct.gui.OnscreenImage import OnscreenImage
 from pandac.PandaModules import TransparencyAttrib
 from pandac.PandaModules import TextNode
@@ -5,6 +6,9 @@ from direct.gui.DirectGui import *
 from pandac.PandaModules import * 
 
 class HUD(object):
+    """The hud is the display on the top left of the screen during gameplay
+    It shows the values for spin, force, yellow's score, red's score, the number of rocks
+    that have been thrown, and the end the players are on."""
     def __init__(self,world):     
         self.world = world
         self.weight = 0

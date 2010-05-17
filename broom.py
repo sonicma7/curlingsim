@@ -1,3 +1,4 @@
+#Copyright Mark Aversa, Jeremy Therrien
 import direct.directbase.DirectStart
 from direct.showbase.DirectObject import DirectObject
 from direct.actor.Actor import Actor
@@ -18,6 +19,8 @@ import world
 from pandac.PandaModules import Filename
 
 class Broom(DirectObject):
+    """The broom class holds all the information pertaining to the broom.
+    It is also responsible for altering the friction of the rock and helps with aiming."""
     def __init__(self, world):
         self.world = world
         self.broom1 = loader.loadModel("art/Broom.egg")
@@ -36,7 +39,8 @@ class Broom(DirectObject):
         self.sweepingRock = ""
         
         self.sweep = False
-        
+    
+    #Input
     def setSweep(self,key):
         self.sweep = key
 
@@ -47,7 +51,8 @@ class Broom(DirectObject):
     def showBroom(self):
         self.broom1.reparentTo(render) 
         self.broom2.reparentTo(render)
-                
+
+    #Called every frame.  Changes friction if sweeping and changes the aiming position if in the right camera view
     def Update(self):
         if self.world.rocksMoving == True and self.sweepingRock != "":
             self.showBroom()
@@ -85,8 +90,9 @@ class Broom(DirectObject):
             self.broom1.setX(self.broom1.getX()+self.broom1Offset[self.broom1OffsetPos])
             self.broom2.setX(self.broom2.getX()+self.broom2Offset[self.broom2OffsetPos])  
             
-            
+
 class AimBroom(DirectObject):
+    """The broom used for aiming purposes"""
     def __init__(self, world):
         self.world = world                                     
         self.broom = loader.loadModel("art/Broom.egg")
@@ -119,15 +125,15 @@ class AimBroom(DirectObject):
             self.myTraverser.showCollisions(render)
     
             if self.myHandler.getNumEntries() > 0:
-    			
+                
                 # Get number of objects detected
                 numObjs = self.myHandler.getNumEntries()
-    			
+                
                 # Sort the entries such that the closest object comes first
                 self.myHandler.sortEntries()
                 foundObj = False
                 i = 0
-    			
+                
                 # Find the closest object with the appropriate tag
                 while not foundObj:
                     if i >= numObjs:
